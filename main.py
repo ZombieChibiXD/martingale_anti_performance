@@ -7,15 +7,18 @@ def coinflip():
 
 
 
-
+# Get 2% of 100000
+TEN_PERCENT = 100000 * 0.02
 
 
 # Starting VARIABLES
 # You can change these variables to your liking
-STARTING_FUNDS = 1000000
-ITERATION = 1000
-MARTINGALE_STARTING_BET = 500
-ANTI_MARTINGALE_STARTING_BET = 500
+STARTING_FUNDS = 1 * 10**6
+ITERATION = 100000
+FUND_INCREMENT_ITERATION = 100
+# Starting bet is 0.005 % of your starting funds
+MARTINGALE_STARTING_BET = STARTING_FUNDS * 5 // (100000)
+ANTI_MARTINGALE_STARTING_BET = STARTING_FUNDS * 100 // (100000)
 MARTINGALE_MULTIPLIER = 2
 AM_WIN_COUNT = 0
 # For the true anti-martingale strategy, you need to set this to INFINITY
@@ -36,6 +39,8 @@ RESULT = []
 for i in range(1, ITERATION+1):
   MARTINGALE_FUNDS -= MARTINGALE_BET
   ANTI_MARTINGALE_FUNDS -= ANTI_MARTINGALE_BET
+  MARTINGALE_FUNDS += FUND_INCREMENT_ITERATION
+  ANTI_MARTINGALE_FUNDS += FUND_INCREMENT_ITERATION
 
   if ANTI_MARTINGALE_FUNDS <= 0 or MARTINGALE_FUNDS <= 0:
     break
@@ -80,8 +85,9 @@ for i in range(1, ITERATION+1):
 print(tabulate(RESULT, headers=['No', 'Win', 'OM Funds', 'OM Bet', 'M Profit', 'AM Funds', 'AM Bet', 'AM Profit', 'AMW', 'AML']))
 
 # Print growth percentage
-print("Martingale Percentage: %.2f%%" % (100*(MARTINGALE_FUNDS-STARTING_FUNDS)/STARTING_FUNDS),(MARTINGALE_FUNDS-STARTING_FUNDS))
-print("Anti-Martingale Percentage: %.2f%%" % (100*(ANTI_MARTINGALE_FUNDS-STARTING_FUNDS)/STARTING_FUNDS), (ANTI_MARTINGALE_FUNDS-STARTING_FUNDS))
+SAVING_FUNDS = STARTING_FUNDS + FUND_INCREMENT_ITERATION*len(RESULT)
+print("Martingale Percentage: %.2f%%" % (100*(MARTINGALE_FUNDS-SAVING_FUNDS)/SAVING_FUNDS),(MARTINGALE_FUNDS-SAVING_FUNDS))
+print("Anti-Martingale Percentage: %.2f%%" % (100*(ANTI_MARTINGALE_FUNDS-SAVING_FUNDS)/SAVING_FUNDS), (ANTI_MARTINGALE_FUNDS-SAVING_FUNDS))
 
 # Output the final results to CSV
 # import csv
@@ -98,5 +104,6 @@ import matplotlib.pyplot as plt
 
 plt.plot(range(len(RESULT)), [x[2] for x in RESULT], label='Martingale')
 plt.plot(range(len(RESULT)), [x[5] for x in RESULT], label='Modified Anti-Martingale')
+plt.plot(range(len(RESULT)), [STARTING_FUNDS+x*FUND_INCREMENT_ITERATION for x in range(len(RESULT))], label='Starting fund + savings')
 plt.legend()
 plt.show()
