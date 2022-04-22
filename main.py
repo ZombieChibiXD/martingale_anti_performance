@@ -78,6 +78,7 @@ for i in range(1, ITERATION+1):
       AM_WIN_COUNT = 0
 
   # Print out the results, like a table
+  SAVING_FUNDS = STARTING_FUNDS + FUND_INCREMENT_ITERATION * (i-1)
   RESULT.append(
     ( i,
       win and "W" or "L",
